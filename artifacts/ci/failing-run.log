@@ -1,0 +1,17 @@
+[CI] npm run test
+FAIL tests/unit/paymentProcessor.boundary.test.ts
+  calculateDiscount
+    x does not apply discount at exactly 100 (7 ms)
+
+  Expected: 0
+  Received: 10
+
+  at Object.<anonymous> (tests/unit/paymentProcessor.boundary.test.ts:14:45)
+
+Summary of all failing tests
+FAIL tests/unit/paymentProcessor.boundary.test.ts
+
+Test Suites: 1 failed, 7 passed, 8 total
+Tests:       1 failed, 32 passed, 33 total
+Snapshots:   0 total
+Time:        22.013 s
