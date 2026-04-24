@@ -1,17 +1,102 @@
-[CI] npm run test
-FAIL tests/unit/paymentProcessor.boundary.test.ts
-  calculateDiscount
-    x does not apply discount at exactly 100 (7 ms)
+──────────────────────────────────────────────────
+  GitHub Actions · ci.yml · Run #847 · branch: feat/coupon-refactor
+  Triggered by: push (commit a3f9c12 — "refactor coupon boundary logic")
+──────────────────────────────────────────────────
 
-  Expected: 0
-  Received: 10
+[CI] Node 20.x  |  npm ci  |  2026-04-24T09:14:02Z
 
-  at Object.<anonymous> (tests/unit/paymentProcessor.boundary.test.ts:14:45)
+> checkout-lab@1.0.0 test
+> jest --runInBand --ci --coverage
 
-Summary of all failing tests
-FAIL tests/unit/paymentProcessor.boundary.test.ts
+PASS  tests/unit/paymentProcessor.test.ts (3.1 s)
 
-Test Suites: 1 failed, 7 passed, 8 total
-Tests:       1 failed, 32 passed, 33 total
-Snapshots:   0 total
-Time:        22.013 s
+FAIL  tests/unit/paymentProcessor.boundary.test.ts (3.8 s)
+  calculateDiscount › boundary cases
+    ✓ returns 0 with no coupon (2 ms)
+    ✓ applies 10% for subtotal > 100 (1 ms)
+    ✗ does not apply discount at exactly 100 (7 ms)
+
+  ● calculateDiscount › does not apply discount at exactly 100
+
+    expect(received).toBe(expected)
+
+    Expected: 0
+    Received: 10
+
+      12 |   it("does not apply discount at exactly 100", () => {
+      13 |     // Boundary: SAVE10 high-value tier requires subtotal STRICTLY above 100
+    > 14 |     expect(calculateDiscount(100, "SAVE10")).toBe(0);
+         |                                             ^
+      15 |   });
+      16 | });
+
+      at Object.<anonymous> (tests/unit/paymentProcessor.boundary.test.ts:14:45)
+
+FAIL  tests/integration/checkout.flaky.test.ts (4.6 s)
+  checkout flow
+    ✗ eventually returns a confirmed payment id (4.6 s)
+
+  ● checkout flow › eventually returns a confirmed payment id
+
+    Error: checkout request timed out
+
+      20 |       new Promise<never>((_resolve, reject) => {
+    > 21 |         setTimeout(() => reject(new Error("checkout request timed out")), 40);
+         |                                ^
+      22 |       })
+
+      at tests/integration/checkout.flaky.test.ts:21:32
+
+> [CI] Retrying flaky suite (attempt 2/2)…
+
+FAIL  tests/integration/checkout.flaky.test.ts (4.9 s)
+  checkout flow
+    ✗ eventually returns a confirmed payment id (4.9 s)
+
+  ● checkout flow › eventually returns a confirmed payment id
+
+    Error: checkout request timed out
+
+      at tests/integration/checkout.flaky.test.ts:21:32
+
+> [CI] npm run test:e2e
+
+> checkout-lab@1.0.0 test:e2e
+> playwright test
+
+Running 3 tests using 1 worker
+
+  ✓  tests/ui/checkout.ui-bugs.spec.ts:7 › UI bug sweep › has no console errors on initial load (1.2s)
+  ✗  tests/ui/checkout.ui-bugs.spec.ts:21 › UI bug sweep › submits checkout flow and renders JSON (3.4s)
+  ✗  tests/ui/checkout.ui-bugs.spec.ts:33 › UI bug sweep › rejects negative subtotal (2.1s)
+
+  1) tests/ui/checkout.ui-bugs.spec.ts:21 › UI bug sweep › submits checkout flow and renders JSON
+
+    Error: expect(locator).toContainText(expected)
+    Locator: locator('#result')
+    Expected string: '"statusCode": 201'
+    Received string: '{"statusCode":500,"error":"Internal Server Error"}'
+
+    at tests/ui/checkout.ui-bugs.spec.ts:28:22
+
+  2) tests/ui/checkout.ui-bugs.spec.ts:33 › UI bug sweep › rejects negative subtotal
+
+    Error: expect(locator).toContainText(expected)
+    Locator: locator('#result')
+    Expected string: '"statusCode": 400'
+    Received string: '{"statusCode":201,"status":"CONFIRMED","paymentId":"pay_student-ui-2_..."}'
+
+    Note: backend accepted a negative subtotal (-10) without returning a validation error.
+
+    at tests/ui/checkout.ui-bugs.spec.ts:42:22
+
+──────────────────────────────────────────────────
+  Summary
+──────────────────────────────────────────────────
+  Test Suites : 3 failed, 1 passed, 4 total
+  Tests       : 4 failed, 3 passed, 7 total (unit + integration + e2e)
+  Snapshots   : 0 total
+  Coverage    : 74.3% statements (threshold: 80%) ← BELOW THRESHOLD
+  Time        : 34.2 s
+
+  Exit code: 1
